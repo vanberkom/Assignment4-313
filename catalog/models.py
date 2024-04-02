@@ -30,13 +30,39 @@ class Genre(models.Model):
             ),
         ]
 
+class Language(models.Model):
+    # Model representing a book genre.
+    name = models.CharField(
+        max_length=40,
+        unique=True,
+        help_text="Enter a language (e.g. English, Spanish etc.)"
+    )
+
+    def __str__(self):
+        # String for representing the Model object.
+        return self.name
+
+    def get_absolute_url(self):
+        # Returns the url to access a particular genre instance.
+        return reverse('language-detail', args=[str(self.id)])
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                name='language_name_case_insensitive_unique',
+                violation_error_message = "Language already exists (case insensitive match)"
+            ),
+        ]
+
 class Book(models.Model):
     # Model representing a book (but not a specific copy of a book).
     title = models.CharField(max_length=200)
     author = models.ForeignKey('Author', on_delete=models.RESTRICT, null=True)
     # Foreign Key used because book can only have one author, but authors can have multiple books.
     # Author as a string rather than object because it hasn't been declared yet in file.
-    language = models.CharField(max_length=50)
+    
+    summary = models.TextField(
         max_length=1000, help_text="Enter a brief description of the book")
     isbn = models.CharField('ISBN', max_length=13,
                             unique=True,
@@ -52,8 +78,14 @@ class Book(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        """Returns the URL to access a detail record for this book."""
+        # Returns the URL to access a detail record for this book.
         return reverse('book-detail', args=[str(self.id)])
+
+    def display_genre(self):
+        # Create a string for the Genre. This is required to display genre in Admin.
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+
+    display_genre.short_description = 'Genre'
 
 class BookInstance(models.Model):
 
@@ -63,6 +95,8 @@ class BookInstance(models.Model):
     book = models.ForeignKey('Book', on_delete=models.RESTRICT, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
+
+    language = models.ManyToManyField(Language, help_text="Select a language for this book")
 
     LOAN_STATUS = (
         ('m', 'Maintenance'),
