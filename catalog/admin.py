@@ -29,6 +29,7 @@ class BookAdmin(admin.ModelAdmin):
     inlines = [BooksInstanceInline]
 
 class BookInstanceAdmin(admin.ModelAdmin):
+    list_display = ('book', 'status', 'due_back', 'id')
     list_filter = ('status', 'due_back')
 
     fieldsets = (
