@@ -5,7 +5,7 @@ from django.db.models.functions import Lower
 import uuid
 from django.conf import settings
 from datetime import date
-
+from django.contrib.auth.models import Permission
 
 
 class Genre(models.Model):
