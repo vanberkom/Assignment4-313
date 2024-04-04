@@ -1,11 +1,15 @@
 {% extends "base_generic.html" %} {% block content %}
 <h1>All Borrowed Books</h1>
 <ul>
-  {% for books in bookinstance_list %}
+  {% for booked in bookinstance_list %}
   <li>
-    <strong>{{ books.book.title }}</strong> by {{ books.book.author }}
-    <br />Borrower: {{ books.borrower.username }} <br />Due back: {{
-    books.due_back }}
+    <strong>{{ booked.book.title }}</strong> <br />by {{ booked.book.author }}
+    <br />Borrower: {{ booked.borrower.username }} <br />
+    <p>Due Back: {{ booked.due_back }}</p>
+    {% if perms.catalog.can_mark_returned %}
+    <a href="{% url 'renew-book-librarian' booked.id %}">Renew</a>
+    <hr />
+    {% endif %}
   </li>
   {% empty %}
   <li>No borrowed books.</li>
